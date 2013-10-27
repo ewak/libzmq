@@ -52,7 +52,7 @@
 #include "msg.hpp"
 #include "address.hpp"
 #include "ipc_address.hpp"
-#include "tcp_address.hpp"
+#include "ip_address.hpp"
 #include "tipc_address.hpp"
 #ifdef ZMQ_HAVE_OPENPGM
 #include "pgm_socket.hpp"
@@ -556,10 +556,10 @@ int zmq::socket_base_t::connect (const char *addr_)
     alloc_assert (paddr);
 
     //  Resolve address (if needed by the protocol)
-    if (protocol == "tcp") {
-        paddr->resolved.tcp_addr = new (std::nothrow) tcp_address_t ();
-        alloc_assert (paddr->resolved.tcp_addr);
-        int rc = paddr->resolved.tcp_addr->resolve (
+    if (protocol == "tcp" || protocol == "sctp") {
+        paddr->resolved.ip_addr = new (std::nothrow) ip_address_t ();
+        alloc_assert (paddr->resolved.ip_addr);
+        int rc = paddr->resolved.ip_addr->resolve (
             address.c_str (), false, options.ipv6);
         if (rc != 0) {
             delete paddr;

@@ -29,7 +29,7 @@
 #include "ip.hpp"
 #include "tcp.hpp"
 #include "address.hpp"
-#include "tcp_address.hpp"
+#include "ip_address.hpp"
 #include "session_base.hpp"
 
 #if defined ZMQ_HAVE_WINDOWS
@@ -207,7 +207,7 @@ int zmq::tcp_connecter_t::open ()
     zmq_assert (s == retired_fd);
 
     //  Create the socket.
-    s = open_socket (addr->resolved.tcp_addr->family (), SOCK_STREAM, IPPROTO_TCP);
+    s = open_socket (addr->resolved.ip_addr->family (), SOCK_STREAM, IPPROTO_TCP);
 #ifdef ZMQ_HAVE_WINDOWS
     if (s == INVALID_SOCKET) {
         errno = wsa_error_to_errno (WSAGetLastError ());
@@ -220,7 +220,7 @@ int zmq::tcp_connecter_t::open ()
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.
     //  Switch it on in such cases.
-    if (addr->resolved.tcp_addr->family () == AF_INET6)
+    if (addr->resolved.ip_addr->family () == AF_INET6)
         enable_ipv4_mapping (s);
 
     // Set the socket to non-blocking mode so that we get async connect().
@@ -234,8 +234,8 @@ int zmq::tcp_connecter_t::open ()
 
     //  Connect to the remote peer.
     int rc = ::connect (
-        s, addr->resolved.tcp_addr->addr (),
-        addr->resolved.tcp_addr->addrlen ());
+        s, addr->resolved.ip_addr->addr (),
+        addr->resolved.ip_addr->addrlen ());
 
     //  Connect was successfull immediately.
     if (rc == 0)

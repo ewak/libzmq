@@ -20,7 +20,7 @@
 #include "platform.hpp"
 #include "address.hpp"
 #include "err.hpp"
-#include "tcp_address.hpp"
+#include "ip_address.hpp"
 #include "ipc_address.hpp"
 #include "tipc_address.hpp"
 
@@ -37,10 +37,10 @@ zmq::address_t::address_t (
 
 zmq::address_t::~address_t ()
 {
-    if (protocol == "tcp") {
-        if (resolved.tcp_addr) {
-            delete resolved.tcp_addr;
-            resolved.tcp_addr = 0;
+    if (protocol == "tcp" || protocol == "sctp") {
+        if (resolved.ip_addr) {
+            delete resolved.ip_addr;
+            resolved.ip_addr = 0;
         }
     }
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
@@ -64,9 +64,9 @@ zmq::address_t::~address_t ()
 
 int zmq::address_t::to_string (std::string &addr_) const
 {
-    if (protocol == "tcp") {
-        if (resolved.tcp_addr)
-            return resolved.tcp_addr->to_string(addr_);
+    if (protocol == "tcp" || protocol == "sctp") {
+        if (resolved.ip_addr)
+            return resolved.ip_addr->to_string(addr_, protocol);
     }
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
     else 

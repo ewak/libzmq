@@ -302,6 +302,7 @@ set(cxx-sources
         io_object.cpp
         io_thread.cpp
         ip.cpp
+        ip_address.cpp
         ipc_address.cpp
         ipc_connecter.cpp
         ipc_listener.cpp
@@ -343,7 +344,6 @@ set(cxx-sources
         stream_engine.cpp
         sub.cpp
         tcp.cpp
-        tcp_address.cpp
         tcp_connecter.cpp
         tcp_listener.cpp
         thread.cpp

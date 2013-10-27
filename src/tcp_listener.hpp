@@ -24,7 +24,7 @@
 #include "own.hpp"
 #include "stdint.hpp"
 #include "io_object.hpp"
-#include "tcp_address.hpp"
+#include "ip_address.hpp"
 #include "../include/zmq.h"
 
 namespace zmq
@@ -66,7 +66,7 @@ namespace zmq
         fd_t accept ();
 
         //  Address to listen on.
-        tcp_address_t address;
+        ip_address_t address;
 
         //  Underlying socket.
         fd_t s;

@@ -32,6 +32,7 @@ libzmq_la_SOURCES = \
     io_object.hpp \
     io_thread.hpp \
     ip.hpp \
+    ip_address.hpp \
     ipc_address.hpp \
     ipc_connecter.hpp \
     ipc_listener.hpp \
@@ -76,7 +77,6 @@ libzmq_la_SOURCES = \
     stream_engine.hpp \
     sub.hpp \
     tcp.hpp \
-    tcp_address.hpp \
     tcp_connecter.hpp \
     tcp_listener.hpp \
     thread.hpp \
@@ -103,6 +103,7 @@ libzmq_la_SOURCES = \
     io_object.cpp \
     io_thread.cpp \
     ip.cpp \
+    ip_address.cpp \
     ipc_address.cpp \
     ipc_connecter.cpp \
     ipc_listener.cpp \
@@ -140,7 +141,6 @@ libzmq_la_SOURCES = \
     stream_engine.cpp \
     sub.cpp \
     tcp.cpp \
-    tcp_address.cpp \
     tcp_connecter.cpp \
     tcp_listener.cpp \
     thread.cpp \

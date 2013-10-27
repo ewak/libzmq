@@ -25,7 +25,7 @@
 
 #include "stddef.h"
 #include "stdint.hpp"
-#include "tcp_address.hpp"
+#include "ip_address.hpp"
 #include "../include/zmq.h"
 
 //  Normal base 256 key is 32 bytes
@@ -114,7 +114,7 @@ namespace zmq
         int tcp_keepalive_intvl;
 
         // TCP accept() filters
-        typedef std::vector <tcp_address_mask_t> tcp_accept_filters_t;
+        typedef std::vector <ip_address_mask_t> tcp_accept_filters_t;
         tcp_accept_filters_t tcp_accept_filters;
 
         //  Security mechanism for all connections on this socket

@@ -240,7 +240,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
             else
             if (optvallen_ > 0 && optvallen_ < 256 && optval_ != NULL && *((const char*) optval_) != 0) {
                 std::string filter_str ((const char *) optval_, optvallen_);
-                tcp_address_mask_t mask;
+                ip_address_mask_t mask;
                 int rc = mask.resolve (filter_str.c_str (), ipv6);
                 if (rc == 0) {
                     tcp_accept_filters.push_back (mask);

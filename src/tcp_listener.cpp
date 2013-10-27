@@ -140,8 +140,8 @@ int zmq::tcp_listener_t::get_address (std::string &addr_)
         return rc;
     }
 
-    tcp_address_t addr ((struct sockaddr *) &ss, sl);
-    return addr.to_string (addr_);
+    ip_address_t addr ((struct sockaddr *) &ss, sl);
+    return addr.to_string (addr_, "tcp");
 }
 
 int zmq::tcp_listener_t::set_address (const char *addr_)
@@ -205,7 +205,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
     errno_assert (rc == 0);
 #endif
 
-    address.to_string (endpoint);
+    address.to_string (endpoint, "tcp");
 
     //  Bind the socket to the network interface and port.
     rc = bind (s, address.addr (), address.addrlen ());
