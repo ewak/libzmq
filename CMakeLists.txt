@@ -336,6 +336,9 @@ set(cxx-sources
         rep.cpp
         req.cpp
         router.cpp
+        sctp.cpp
+        sctp_connecter.cpp
+        sctp_listener.cpp
         select.cpp
         session_base.cpp
         signaler.cpp

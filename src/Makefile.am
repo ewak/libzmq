@@ -133,6 +133,9 @@ libzmq_la_SOURCES = \
     random.cpp \
     rep.cpp \
     req.cpp \
+    sctp.cpp \
+    sctp_connecter.cpp \
+    sctp_listener.cpp \
     select.cpp \
     session_base.cpp \
     signaler.cpp \

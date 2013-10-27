@@ -117,6 +117,17 @@ namespace zmq
         typedef std::vector <ip_address_mask_t> tcp_accept_filters_t;
         tcp_accept_filters_t tcp_accept_filters;
 
+        //  SCTP keep-alive settings.
+        //  Defaults to -1 = do not change socket options
+        int sctp_keepalive;
+        int sctp_keepalive_cnt;
+        int sctp_keepalive_idle;
+        int sctp_keepalive_intvl;
+
+        // SCTP accept() filters
+        typedef std::vector <ip_address_mask_t> sctp_accept_filters_t;
+        sctp_accept_filters_t sctp_accept_filters;
+
         //  Security mechanism for all connections on this socket
         int mechanism;
 

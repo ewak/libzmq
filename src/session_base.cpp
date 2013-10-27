@@ -23,6 +23,7 @@
 #include "pipe.hpp"
 #include "likely.hpp"
 #include "tcp_connecter.hpp"
+#include "sctp_connecter.hpp"
 #include "ipc_connecter.hpp"
 #include "tipc_connecter.hpp"
 #include "pgm_sender.hpp"
@@ -486,6 +487,14 @@ void zmq::session_base_t::start_connecting (bool wait_)
 
     if (addr->protocol == "tcp") {
         tcp_connecter_t *connecter = new (std::nothrow) tcp_connecter_t (
+            io_thread, this, options, addr, wait_);
+        alloc_assert (connecter);
+        launch_child (connecter);
+        return;
+    }
+
+    if (addr->protocol == "sctp") {
+        sctp_connecter_t *connecter = new (std::nothrow) sctp_connecter_t (
             io_thread, this, options, addr, wait_);
         alloc_assert (connecter);
         launch_child (connecter);

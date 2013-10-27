@@ -39,6 +39,17 @@ int main (void)
     assert (rc == -1);
     assert (errno == EINVAL);
 
+    rc = zmq_connect (sock, "sctp://localhost:1234");
+    assert (rc == 0);
+
+    rc = zmq_connect (sock, "sctp://localhost:invalid");
+    assert (rc == -1);
+    assert (errno == EINVAL);
+
+    rc = zmq_connect (sock, "sctp://in val id:1234");
+    assert (rc == -1);
+    assert (errno == EINVAL);
+
     rc = zmq_connect (sock, "invalid://localhost:1234");
     assert (rc == -1);
     assert (errno == EPROTONOSUPPORT);

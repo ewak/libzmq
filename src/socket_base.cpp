@@ -38,9 +38,11 @@
 
 #include "socket_base.hpp"
 #include "tcp_listener.hpp"
+#include "sctp_listener.hpp"
 #include "ipc_listener.hpp"
 #include "tipc_listener.hpp"
 #include "tcp_connecter.hpp"
+#include "sctp_connecter.hpp"
 #include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
@@ -186,7 +188,8 @@ int zmq::socket_base_t::check_protocol (const std::string &protocol_)
 {
     //  First check out whether the protcol is something we are aware of.
     if (protocol_ != "inproc" && protocol_ != "ipc" && protocol_ != "tcp" &&
-          protocol_ != "pgm" && protocol_ != "epgm" && protocol_ != "tipc") {
+          protocol_ != "pgm" && protocol_ != "epgm" && protocol_ != "tipc" &&
+          protocol_ != "sctp") {
         errno = EPROTONOSUPPORT;
         return -1;
     }
@@ -374,6 +377,24 @@ int zmq::socket_base_t::bind (const char *addr_)
 
     if (protocol == "tcp") {
         tcp_listener_t *listener = new (std::nothrow) tcp_listener_t (
+            io_thread, this, options);
+        alloc_assert (listener);
+        int rc = listener->set_address (address.c_str ());
+        if (rc != 0) {
+            delete listener;
+            event_bind_failed (address, zmq_errno());
+            return -1;
+        }
+
+        // Save last endpoint URI
+        listener->get_address (last_endpoint);
+
+        add_endpoint (addr_, (own_t *) listener, NULL);
+        return 0;
+    }
+
+    if (protocol == "sctp") {
+        sctp_listener_t *listener = new (std::nothrow) sctp_listener_t (
             io_thread, this, options);
         alloc_assert (listener);
         int rc = listener->set_address (address.c_str ());

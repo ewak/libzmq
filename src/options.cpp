@@ -249,6 +249,23 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
             }
             break;
 
+        case ZMQ_SCTP_ACCEPT_FILTER:
+            if (optvallen_ == 0 && optval_ == NULL) {
+                sctp_accept_filters.clear ();
+                return 0;
+            }
+            else
+            if (optvallen_ > 0 && optvallen_ < 256 && optval_ != NULL && *((const char*) optval_) != 0) {
+                std::string filter_str ((const char *) optval_, optvallen_);
+                ip_address_mask_t mask;
+                int rc = mask.resolve (filter_str.c_str (), ipv6);
+                if (rc == 0) {
+                    sctp_accept_filters.push_back (mask);
+                    return 0;
+                }
+            }
+            break;
+
         case ZMQ_PLAIN_SERVER:
             if (is_int && (value == 0 || value == 1)) {
                 as_server = value;
