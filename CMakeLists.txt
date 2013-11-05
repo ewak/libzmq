@@ -597,6 +597,7 @@ set(tests
         test_msg_flags
         test_connect_resolve
         test_immediate
+        test_immediate_sctp
         test_last_endpoint
         test_term_endpoint
         test_linger

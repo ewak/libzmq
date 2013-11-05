@@ -15,6 +15,7 @@ noinst_PROGRAMS = test_system \
                   test_msg_flags \
                   test_connect_resolve \
                   test_immediate \
+                  test_immediate_sctp \
                   test_last_endpoint \
                   test_term_endpoint \
                   test_linger \
@@ -76,6 +77,7 @@ test_linger_SOURCES = test_linger.cpp
 test_msg_flags_SOURCES = test_msg_flags.cpp
 test_connect_resolve_SOURCES = test_connect_resolve.cpp
 test_immediate_SOURCES = test_immediate.cpp
+test_immediate_sctp_SOURCES = test_immediate_sctp.cpp
 test_last_endpoint_SOURCES = test_last_endpoint.cpp
 test_term_endpoint_SOURCES = test_term_endpoint.cpp
 test_monitor_SOURCES = test_monitor.cpp
