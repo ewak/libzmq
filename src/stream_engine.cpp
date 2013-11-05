@@ -52,7 +52,7 @@
 #include "likely.hpp"
 #include "wire.hpp"
 
-zmq::stream_engine_t::stream_engine_t (fd_t fd_, const options_t &options_, 
+zmq::stream_engine_t::stream_engine_t (fd_t fd_, const options_t &options_,
                                        const std::string &endpoint_) :
     s (fd_),
     inpos (NULL),
@@ -76,11 +76,13 @@ zmq::stream_engine_t::stream_engine_t (fd_t fd_, const options_t &options_,
     mechanism (NULL),
     input_stopped (false),
     output_stopped (false),
-    socket (NULL)
+    socket (NULL),
+    os_read_func (NULL),
+    os_write_func (NULL)
 {
     int rc = tx_msg.init ();
     errno_assert (rc == 0);
-    
+
     //  Put the socket into non-blocking mode.
     unblock_socket (s);
 
@@ -743,7 +745,7 @@ int zmq::stream_engine_t::write (const void *data_, size_t size_)
     //  we'll get an error (this may happen during the speculative write).
     if (nbytes == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK)
         return 0;
-        
+
     //  Signalise peer failure.
     if (nbytes == SOCKET_ERROR && (
           WSAGetLastError () == WSAENETDOWN ||
@@ -758,33 +760,38 @@ int zmq::stream_engine_t::write (const void *data_, size_t size_)
     return nbytes;
 
 #else
-
-    ssize_t nbytes = send (s, data_, size_, 0);
-
-    //  Several errors are OK. When speculative write is being done we may not
-    //  be able to write a single byte from the socket. Also, SIGSTOP issued
-    //  by a debugging tool can result in EINTR error.
-    if (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK ||
-          errno == EINTR))
-        return 0;
-
-    //  Signalise peer failure.
-    if (nbytes == -1) {
-        errno_assert (errno != EACCES
-                   && errno != EBADF
-                   && errno != EDESTADDRREQ
-                   && errno != EFAULT
-                   && errno != EINVAL
-                   && errno != EISCONN
-                   && errno != EMSGSIZE
-                   && errno != ENOMEM
-                   && errno != ENOTSOCK
-                   && errno != EOPNOTSUPP);
-        return -1;
+    if( os_write_func )
+    {
+        return os_write_func (s, data_, size_);
     }
+    else
+    {
+        ssize_t nbytes = send (s, data_, size_, 0);
 
-    return static_cast <int> (nbytes);
+        //  Several errors are OK. When speculative write is being done we may not
+        //  be able to write a single byte from the socket. Also, SIGSTOP issued
+        //  by a debugging tool can result in EINTR error.
+        if (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK ||
+              errno == EINTR))
+            return 0;
 
+        //  Signalise peer failure.
+        if (nbytes == -1) {
+            errno_assert (errno != EACCES
+                       && errno != EBADF
+                       && errno != EDESTADDRREQ
+                       && errno != EFAULT
+                       && errno != EINVAL
+                       && errno != EISCONN
+                       && errno != EMSGSIZE
+                       && errno != ENOMEM
+                       && errno != ENOTSOCK
+                       && errno != EOPNOTSUPP);
+            return -1;
+        }
+
+        return static_cast <int> (nbytes);
+    }
 #endif
 }
 
@@ -814,36 +821,51 @@ int zmq::stream_engine_t::read (void *data_, size_t size_)
 
     //  Orderly shutdown by the other peer.
     if (nbytes == 0)
-        return -1; 
+        return -1;
 
     return nbytes;
 
 #else
-
-    ssize_t nbytes = recv (s, data_, size_, 0);
-
-    //  Several errors are OK. When speculative read is being done we may not
-    //  be able to read a single byte from the socket. Also, SIGSTOP issued
-    //  by a debugging tool can result in EINTR error.
-    if (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK ||
-          errno == EINTR))
-        return 0;
-
-    //  Signalise peer failure.
-    if (nbytes == -1) {
-        errno_assert (errno != EBADF
-                   && errno != EFAULT
-                   && errno != EINVAL
-                   && errno != ENOMEM
-                   && errno != ENOTSOCK);
-        return -1;
+    if( os_read_func )
+    {
+        return os_read_func (s, data_, size_);
     }
+    else
+    {
+        ssize_t nbytes = recv (s, data_, size_, 0);
 
-    //  Orderly shutdown by the peer.
-    if (nbytes == 0)
-        return -1;
+        //  Several errors are OK. When speculative read is being done we may not
+        //  be able to read a single byte from the socket. Also, SIGSTOP issued
+        //  by a debugging tool can result in EINTR error.
+        if (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK ||
+              errno == EINTR))
+            return 0;
 
-    return static_cast <int> (nbytes);
+        //  Signalise peer failure.
+        if (nbytes == -1) {
+            errno_assert (errno != EBADF
+                       && errno != EFAULT
+                       && errno != EINVAL
+                       && errno != ENOMEM
+                       && errno != ENOTSOCK);
+            return -1;
+        }
 
+        //  Orderly shutdown by the peer.
+        if (nbytes == 0)
+            return -1;
+
+        return static_cast <int> (nbytes);
+    }
 #endif
+}
+
+void zmq::stream_engine_t::set_os_read_func (int (*read_func_) (fd_t s, void *data_, size_t size_) )
+{
+    os_read_func = read_func_;
+}
+
+void zmq::stream_engine_t::set_os_write_func (int (*write_func_) (fd_t s, const void *data_, size_t size_) )
+{
+    os_write_func = write_func_;
 }

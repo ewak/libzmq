@@ -52,7 +52,7 @@ namespace zmq
     {
     public:
 
-        stream_engine_t (fd_t fd_, const options_t &options_, 
+        stream_engine_t (fd_t fd_, const options_t &options_,
                          const std::string &endpoint);
         ~stream_engine_t ();
 
@@ -67,6 +67,10 @@ namespace zmq
         //  i_poll_events interface implementation.
         void in_event ();
         void out_event ();
+
+        // FIXME: make this an interface
+        void set_os_read_func (int (*read_func_) (fd_t s, void *data_, size_t size_) );
+        void set_os_write_func (int (*write_func_) (fd_t s, const void *data_, size_t size_) );
 
     private:
 
@@ -191,6 +195,9 @@ namespace zmq
 
         stream_engine_t (const stream_engine_t&);
         const stream_engine_t &operator = (const stream_engine_t&);
+
+        int (*os_read_func) (fd_t s, void *data_, size_t size_);
+        int (*os_write_func) (fd_t s, const void *data_, size_t size_);
     };
 
 }
